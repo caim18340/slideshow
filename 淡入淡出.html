@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>基于原生JavaScript淡入淡出效果</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			li{
+				list-style: none;
+			}
+			.banner{
+				width:1200px;
+				height:350px;
+				background:#000000;
+				position: relative;
+				margin: 50px auto;
+			}
+			.list li{
+				position: absolute;
+				top: 0;
+				left: 0;
+				width:1200px;
+				height:350px;
+			}
+			.list li img{
+				width:1200px;
+				height:350px;
+				border: none;
+			}
+			.list li:nth-child(1){
+				z-index: 4;
+			}
+			.list li:nth-child(2){
+				z-index: 3;
+			}
+			.list li:nth-child(3){
+				z-index: 2;
+			}
+			.list li:nth-child(4){
+				z-index: 1;
+			}
+			.dots{
+				position: absolute;
+				right: 500px;
+				bottom: 10px;
+				z-index: 10;
+			}
+			.dots li{
+				width: 30px;
+				height: 10px;
+				border-radius: 5px;
+				background: #fff;
+				float: left;
+				text-align: center;
+				font-size: 20px;
+				line-height: 30px;
+				margin-right: 20px;
+				cursor: pointer;
+			}
+			.dots li.active{
+				background: skyblue;
+			}
+			.toLeft{
+				width:60px;
+				height:60px;
+				background: url(./img/btn.gif);
+				position: absolute;
+				left:30px;
+				top: 145px;
+				z-index: 20;
+			}
+			.toRight{
+				width:60px;
+				height:60px;
+				background: url(./img/btn.gif) 0 60px;
+				position: absolute;
+				right:30px;
+				top: 145px;
+				z-index: 20;
+			}
+			.arr{
+				display: none;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="banner" id="banner">
+			<ul class="list" id="list">
+				<li><img src="img/first.jpg" alt="" /></li>
+				<li><img src="img/second.jpg" alt="" /></li>
+				<li><img src="img/three.jpg" alt="" /></li>
+				<li><img src="img/four.jpg" alt="" /></li>
+			</ul>
+			<ul class="dots" id="dots">
+				<li class="active"></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+			<div class="arr" id="arr">
+				<div class="toLeft" id="toLeft"></div>
+				<div class="toRight" id="toRight"></div>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/轮播.js"></script>
+<script type="text/javascript">
+	var box = $id('list'); //获取整个展示图片
+	var list = box.children; //获取展示的每个图片
+	var dots = $id('dots').children; //获取每个下标圆圈
+	var timer = null; //用来保存定时器
+	var index = 0; //展示图片的索引
+	timer = setInterval(autoPlay,2500); //为时2.5s的周期定时器
+	function autoPlay(){ //进行无缝轮播的函数
+		index++; //让索引值自加
+		for(var i=0;i<dots.length;i++){ //遍历下标排他思想先让所有的都没有这个class属性的样式，然后动态隐藏
+			dots[i].className = "";
+			move(list[i],{opacity : 0});
+		}
+		if(index == 4){ //当索引值为最后一张图片立马没有特效的跳到第一个图片，索引值也变成0
+			index = 0;
+		}
+		dots[index].className = "active"; //就当图片对应的下标才加上这个class属性的样式
+		move(list[index],{opacity : 100}); //运动函数根据索引值index的变化进行改变
+	}
+	for(let i=0;i<dots.length;i++){ //遍历每个椭圆形状
+		dots[i].onmouseover = function(){
+			index = i - 1;
+			autoPlay();
+		}
+	}
+	$id('banner').onmouseover = function(){
+		clearInterval(timer);
+		$id('arr').style.display = "block";
+	}
+	$id('banner').onmouseout = function(){
+		$id('arr').style.display = "none";
+		timer = setInterval(autoPlay,2500);
+	}
+	$id('toLeft').onclick = function(){
+		for(var i=0;i<dots.length;i++){
+			dots[i].className = "";
+			move(list[index],{opacity : 0});
+		}
+		index--;
+		if(index == -1){
+			index = 3;
+		}
+		dots[index].className = "active";
+		move(list[index],{opacity : 100});
+	}
+	$id('toRight').onclick = function(){
+		for(var i=0;i<dots.length;i++){
+			dots[i].className = "";
+			move(list[index],{opacity : 0});
+		}
+		index++;
+		if(index == dots.length){
+			index = 0;
+		}
+		dots[index].className = "active";
+		move(list[index],{opacity : 100});
+	}
+</script>

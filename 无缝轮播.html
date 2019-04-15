@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>基于原生JavaScript无缝轮播效果</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			li{
+				list-style: none;
+			}
+			.banner{
+				width:1200px;
+				height:350px;
+				position: relative;
+				margin: 50px auto;
+				overflow:hidden;
+			}
+			.list{
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 6000px;
+			}
+			.list li{
+				width:1200px;
+				height:350px;
+				float: left;
+			}
+			.list li img{
+				width:1200px;
+				height:350px;
+				border: none;
+			}
+			.dots{
+				position: absolute;
+				right: 100px;
+				bottom: 50px;
+			}
+			.dots li{
+				width: 30px;
+				height: 30px;
+				background: #fff;
+				float: left;
+				text-align: center;
+				font-size: 20px;
+				line-height: 30px;
+				margin-right: 10px;
+				border-radius: 50%;
+				cursor: pointer;
+			}
+			.dots li.active{
+				background: skyblue;
+			}
+			.toLeft{
+				width:60px;
+				height:60px;
+				background: url(./img/btn.gif);
+				position: absolute;
+				left:30px;
+				top: 145px;
+			}
+			.toRight{
+				width:60px;
+				height:60px;
+				background: url(./img/btn.gif) 0 60px;
+				position: absolute;
+				right:30px;
+				top: 145px;
+			}
+			.arr{
+				opacity: 0;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="banner" id="banner">
+			<ul class="list" id="list">
+				<li><img src="img/first.jpg" alt="" /></li>
+				<li><img src="img/second.jpg" alt="" /></li>
+				<li><img src="img/three.jpg" alt="" /></li>
+				<li><img src="img/four.jpg" alt="" /></li>
+				<li><img src="img/first.jpg" alt="" /></li>
+			</ul>
+			<ul class="dots" id="dots">
+				<li class="active">1</li>
+				<li>2</li>
+				<li>3</li>
+				<li>4</li>
+			</ul>
+			<div class="arr" id="arr">
+				<div class="toLeft" id="toLeft"></div>
+				<div class="toRight" id="toRight"></div>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/轮播.js"></script>
+<script type="text/javascript">
+	var box = $id('list'); //获取整个展示图片
+	var list = box.children; //获取展示的每个图片
+	var dots = $id('dots').children; //获取每个下标圆圈
+	var timer = null; //用来保存定时器
+	var index = 0; //展示图片的索引
+	timer = setInterval(autoPlay,2500); //为时2.5s的周期定时器
+	function autoPlay(){ //进行无缝轮播的函数
+		index++; //让索引值自加
+		if(index == 5){ //当索引值为最后一张图片立马没有特效的跳到第一个图片，索引值也变成1
+			index = 1;
+			box.style.left = 0; //让整个展示图片跟刚开始一样的位置
+		}
+		for(var i=0;i<dots.length;i++){ //遍历下标排他思想先让所有的都没有这个class属性的样式
+			dots[i].className = "";
+		}
+		dots[index == 4 ? 0 : index].className = "active"; //就当图片对应的下标才加上这个class属性的样式
+		move(box,{left : -index * 1200}); //运动函数根据索引值index的变化进行改变
+		
+	}
+	$id('banner').onmouseover = function(){ //当鼠标滑过展示区域时让左右箭头图片动态显示
+		clearInterval(timer); //清除轮播定时器
+		move($id('arr'),{opacity : 100});
+	}
+	$id('banner').onmouseout = function(){ //当鼠标离开展示区域时让左右箭头图片动态隐藏
+		move($id('arr'),{opacity : 0});
+		timer = setInterval(autoPlay,2500); //打开轮播定时器
+	}
+	for(let i=0;i<dots.length;i++){ //遍历每个下标
+		dots[i].onclick = function(){ //当点击指定下表时调用轮播定时器显示当前下标图片
+			index = i-1;
+			autoPlay();
+			move($id('arr'),{opacity : 0}); //使左右箭头图片不显示
+		}
+	}
+	$id('toLeft').onclick = function(){ //当点击右键头图片时
+		for(var i=0;i<dots.length;i++){ 
+			dots[i].className = "";
+		}
+		index--; //索引值自减
+		if(index == -1){ //当索引值自减到比第一张索引值0还小时让其没有动画跳到第四张图片索引值3
+			index = 3;
+			box.style.left = "-3600px";
+		}
+		dots[index].className = "active";
+		move(box,{left : -index * 1200});
+	}
+	$id('toRight').onclick = function(){ //当点击左键头图片时
+		for(var i=0;i<dots.length;i++){
+			dots[i].className = "";
+		}
+		if(index == 4){ //当索引值为最后一张图片，因为最后一张跟第一张一样，让其索引值等于第一张0,防止再点击左箭头报错
+			index = 0;
+			box.style.left = 0;
+		}
+		index++; //索引值自加
+		if(index == 4){ //当索引值为最后一张图片，因为最后一张跟第一张一样，让其索引值等于第一张0,实现轮播的效果
+			index = 0;
+			box.style.left = 0;
+		}
+		dots[index].className = "active";
+		move(box,{left : -index * 1200});
+	}
+</script>
